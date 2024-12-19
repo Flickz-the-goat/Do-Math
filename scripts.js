@@ -4,49 +4,42 @@ const buttonLabels = [
     "7", "8", "9", "*",
     "4", "5", "6", "-",
     "1", "2", "3", "+",
-    "0", ".","=", " "
+    "0", ".","="
 ];
 let index = 0; 
 for(let i = 0; i < 5; i++){ //add the spaces to put in the buttons
     const space = document.createElement("div");
     space.classList.add("space");
-    if(i === 4){
-        space.id = "last"; 
-    }
     butt.appendChild(space); 
     addButtons(space); 
 }
 function addButtons(space){
     for(let i = 0; i < 4; i++){  //add the buttons into the space
-        const button = document.createElement("div");
-        button.classList.add("button");
-        if(i === 3){
-            button.id = "bLast"; 
+        if(index != buttonLabels.length){
+            const button = document.createElement("div");
+            button.classList.add("button");
+            space.appendChild(button);
+            addLabel(button, index); 
+            index++; 
         }
-        space.appendChild(button);
-        addLabel(button, index); 
-        index++; 
     }
 }
 function addLabel(button, index){
     const label = document.createElement("p"); 
     label.classList.add("label");
+    button.classList.add(buttonLabels[index]); 
     label.textContent = buttonLabels[index]; 
     button.appendChild(label); 
 }
-index = 0; 
-//remove the last button and do some extra styling
-const last = document.querySelector("#last");
-let remove = document.querySelectorAll("#bLast");
-last.removeChild(remove[4]); 
-last.lastChild.id = "bLast";
-remove = document.querySelectorAll("#bLast"); 
-remove.forEach((remove)=>{
-    remove.style.backgroundColor = "#134b5f"; 
+const space = document.querySelectorAll(".space");
+space.forEach((space)=>{
+    space.lastChild.style.backgroundColor = "#0f3c4c"; 
 });
+index = 0;  
 //all the math functions 
 let n1 = null; 
 let n2 = null;
+let result = null; 
 let operator = null; 
 const screen = document.querySelector(".screen"); 
 
@@ -68,61 +61,97 @@ function modulo(){
 function equate(){
     switch (operator){
         case "+":
-            add(); 
+            result = add(); 
             break;
         case "-":
-            subtract();
+            result = subtract();
             break; 
         case "*":
-            multiply();
+            result = multiply();
             break;
         case "/":
-            divide();
+            result = divide();
             break;
         default:
-            modulo();
+            result = modulo();
     }
-    operator = null; reset 
+    screen.lastChild.textContent = Math.round(result); 
+    n1 = result; //for future additions
+    operator = null; //reset 
 }
-remove.forEach((remove)=>{
+space.forEach((space)=>{
     switch (index){
         case 0:
-            remove.addEventListener("click", ()=>{
-                if(operator == null){
-                    screen.lastChild.textContent = "/"; 
+            space.lastChild.addEventListener("click", ()=>{
+                if(screen.lastChild.textContent != ""){
+                    n1= parseInt(screen.lastChild.textContent); 
+                    screen.lastChild.textContent = ""; 
                 }
                 operator = "/";
             });
             break; 
         case 1:
-            remove.addEventListener("click", ()=>{
-                if(operator == null){
-                    screen.lastChild.textContent = "*"; 
+            space.lastChild.addEventListener("click", ()=>{
+                if(screen.lastChild.textContent != ""){
+                    n1= parseInt(screen.lastChild.textContent); 
+                    screen.lastChild.textContent = ""; 
                 }
                 operator = "*";
             });
             break; 
         case 2:
-            remove.addEventListener("click", ()=>{
-                if(operator == null){
-                    screen.lastChild.textContent = "-"; 
+            space.lastChild.addEventListener("click", ()=>{
+                if(screen.lastChild.textContent != ""){
+                    n1= parseInt(screen.lastChild.textContent); 
+                    screen.lastChild.textContent = ""; 
                 }
                 operator = "-";
             });
             break; 
         case 3:
-            remove.addEventListener("click", ()=>{
-                if(operator == null){
-                    screen.lastChild.textContent = "+"; 
+            space.lastChild.addEventListener("click", ()=>{
+                if(screen.lastChild.textContent != ""){
+                    n1= parseInt(screen.lastChild.textContent); 
+                    screen.lastChild.textContent = ""; 
                 }
                 operator = "+";
             });
             break; 
         case 4:
-            remove.addEventListener("click", ()=>{
-                equate(); 
+            space.lastChild.addEventListener("click", ()=>{
+                if(screen.lastChild.textContent != ""){
+                    n2 = parseInt(screen.lastChild.textContent);
+                    if(n1 != null && operator != null) {
+                        equate();
+                    }
+                }
             });
             break; 
     }
     index++; 
+});
+index = 0; 
+//adding clicks for all the numbers
+const button = document.querySelectorAll(".button");
+button.forEach((button)=>{
+    let arr = ["*", "+", "-", "/", "=", "%", "AC", "+/-"];
+    if(!arr.includes(button.classList[1]))
+        button.addEventListener("click", ()=>{
+            screen.lastChild.textContent += button.classList[1]; 
+            if(operator != null){
+                n2 = parseInt(screen.lastChild.textContent);
+            }
+            else{
+                n1 = parseInt(screen.lastChild.textContent); 
+            }
+        })
+    if(button.classList[1] === "AC"){
+        button.addEventListener("click", ()=>{
+            screen.lastChild.textContent = ""; 
+            //reset
+            n1 = null;
+            n2 = null;
+            operator = null; 
+        })
+    }
 });
